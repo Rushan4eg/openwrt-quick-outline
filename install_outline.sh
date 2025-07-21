@@ -1,6 +1,47 @@
 #!/bin/sh
 # Outline scripted, xjasonlyu/tun2socks based installer for OpenWRT.
 # https://github.com/1andrevich/outline-install-wrt
+# Outline scripted, xjasonlyu/tun2socks based installer for OpenWRT.
+# https://github.com/1andrevich/outline-install-wrt
+echo 'Starting Outline OpenWRT install script'
+
+OUTLINE_INIT="/etc/init.d/tun2socks"
+DEFROUTE_TMP="/tmp/defroute.save"
+TUN_DEV="tun1"
+
+stop_services() {
+    echo "[INFO] Stopping tun2socks and cleaning up..."
+
+    if [ -f "$OUTLINE_INIT" ]; then
+        "$OUTLINE_INIT" stop
+        "$OUTLINE_INIT" disable
+    fi
+
+    if ip route | grep -q "$TUN_DEV"; then
+        ip link set "$TUN_DEV" down 2>/dev/null
+        ip route del default dev "$TUN_DEV" 2>/dev/null
+        ip route del 172.16.10.2 dev "$TUN_DEV" 2>/dev/null
+    fi
+
+    if [ -f "$DEFROUTE_TMP" ]; then
+        ip route restore default < "$DEFROUTE_TMP"
+        echo "[INFO] Restored default route"
+    fi
+
+    echo "[INFO] tun2socks service stopped and routing cleaned."
+    exit 0
+}
+
+if [ "$1" = "--stop" ]; then
+    stop_services
+fi
+
+if [ "$1" = "--restart" ]; then
+    stop_services
+    echo "[INFO] Restarting installation and services..."
+    # Continue to re-run script as normal
+fi
+
 echo 'Starting Outline OpenWRT install script'
 
 # Step 1: Install required packages
