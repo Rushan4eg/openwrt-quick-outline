@@ -3,6 +3,11 @@
 # https://github.com/1andrevich/outline-install-wrt
 echo 'Starting Outline OpenWRT install script'
 
+# Step 1: Install required packages
+echo "[STEP 1] Installing dependencies..."
+opkg update
+opkg install kmod-tun ip-full
+
 # Step 1: Check for kmod-tun
 opkg list-installed | grep kmod-tun > /dev/null
 if [ $? -ne 0 ]; then
