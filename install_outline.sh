@@ -77,10 +77,11 @@ echo 'found entry into /etc/config/firewall'
 /etc/init.d/network restart
 echo 'Restarting Network....'
 
-# Step 8: Read user variable for OUTLINE HOST IP
-read -p "Enter Outline Server IP: " OUTLINEIP
-# Read user variable for Outline config
-read -p "Enter Outline (Shadowsocks) Config (format ss://base64coded@HOST:PORT/?outline=1): " OUTLINECONF
+# Step 8: Read user variable for Outline config
+read -p "Enter Outline (Shadowsocks) Config (format ss://base64@HOST:PORT/?outline=1): " OUTLINECONF
+
+# Automatically extract IP or hostname from the config
+OUTLINEIP=$(echo "$OUTLINECONF" | sed -n 's|.*@\(.*\):.*|\1|p')
 
 #Step 9. Check for default gateway and save it into DEFGW
 DEFGW=$(ip route | grep default | awk '{print $3}')
