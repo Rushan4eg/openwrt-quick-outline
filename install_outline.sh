@@ -83,6 +83,12 @@ read -p "Enter Outline (Shadowsocks) Config (format ss://base64@HOST:PORT/?outli
 # Automatically extract IP or hostname from the config
 OUTLINEIP=$(echo "$OUTLINECONF" | sed -n 's|.*@\(.*\):.*|\1|p')
 
+# Ask user for buffer size with pre-filled default value "4mb"
+echo -n "Enter buffer size for tun2socks (default 4mb, can be 64kb, 128gb, 1mb etc) : "
+read BUFFER
+[ -z "$BUFFER" ] && BUFFER="4mb"
+
+
 #Step 9. Check for default gateway and save it into DEFGW
 DEFGW=$(ip route | grep default | awk '{print $3}')
 echo 'checked default gateway'
@@ -106,12 +112,12 @@ STOP=89
 #IF="tun1"
 #OUTLINE_CONFIG="$OUTLINECONF"
 #LOGLEVEL="warning"
-#BUFFER="64kb"
+#BUFFER="4mb"
 
 start_service() {
     procd_open_instance
     procd_set_param user root
-    procd_set_param command /usr/bin/tun2socks -device tun1 -tcp-rcvbuf 64kb -tcp-sndbuf 64kb  -proxy "$OUTLINECONF" -loglevel "warning"
+    procd_set_param command /usr/bin/tun2socks -device tun1 -tcp-rcvbuf "$BUFFER" -tcp-sndbuf "$BUFFER" -proxy "$OUTLINECONF" -loglevel "warning"
     procd_set_param stdout 1
     procd_set_param stderr 1
     procd_set_param respawn "${respawn_threshold:-3600}" "${respawn_timeout:-5}" "${respawn_retry:-5}"
