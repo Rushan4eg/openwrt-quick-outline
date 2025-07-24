@@ -2,6 +2,11 @@
 # Modified Outline scripted installer for OpenWRT
 # Fixes SSH disconnection on subsequent runs
 
+# CONFIGURATION: Set your Outline config here to skip manual input
+# Leave empty to prompt for input during script execution
+# Example: PRESET_OUTLINE_CONFIG="ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpHIXlCd1BXSDNWYW9AMTkyLjI0MS4xNTQuMTc6ODA4Mw/?outline=1"
+PRESET_OUTLINE_CONFIG=""
+
 echo 'Starting Outline OpenWRT install script'
 
 # Step 1: Check for kmod-tun
@@ -91,8 +96,13 @@ else
     echo 'No network changes needed, skipping restart'
 fi
 
-# Step 8: Read Outline config and extract server IP
-read -p "Enter Outline (Shadowsocks) Config (format ss://base64coded@HOST:PORT/?outline=1): " OUTLINECONF
+# Step 8: Get Outline config (from preset or user input)
+if [ -n "$PRESET_OUTLINE_CONFIG" ] && echo "$PRESET_OUTLINE_CONFIG" | grep -q "^ss://"; then
+    OUTLINECONF="$PRESET_OUTLINE_CONFIG"
+    echo "Using preset Outline config from script"
+else
+    read -p "Enter Outline (Shadowsocks) Config (format ss://base64coded@HOST:PORT/?outline=1): " OUTLINECONF
+fi
 
 # Extract server IP from ss:// URL
 OUTLINEIP=$(echo "$OUTLINECONF" | sed -n 's/.*@\([^:]*\):.*/\1/p')
@@ -101,7 +111,7 @@ if [ -z "$OUTLINEIP" ]; then
     echo "Expected format: ss://base64coded@HOST:PORT/?outline=1"
     exit 1
 fi
-echo "Extracted server IP: $OUTLINEIP"
+echo "Using server IP: $OUTLINEIP"
 
 # Step 9: Check for default gateway
 DEFGW=$(ip route | grep default | awk '{print $3}')
