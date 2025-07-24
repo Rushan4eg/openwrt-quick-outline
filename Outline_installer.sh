@@ -9,7 +9,15 @@ if [ $? -eq 0 ]; then
     chmod +x ./install_outline.sh
     echo "Script downloaded successfully to ./install_outline.sh"
     
-    read -p "Would you like to run the Outline installer now? (y/n): " RUN_NOW
+    # Fix for piped execution: read from /dev/tty instead of stdin
+    if [ -t 0 ]; then
+        # Running interactively
+        read -p "Would you like to run the Outline installer now? (y/n): " RUN_NOW
+    else
+        # Being piped, read from terminal directly
+        echo "Would you like to run the Outline installer now? (y/n): "
+        read RUN_NOW < /dev/tty
+    fi
     
     if [ "$RUN_NOW" = "y" ] || [ "$RUN_NOW" = "Y" ]; then
         echo "Running installer..."
