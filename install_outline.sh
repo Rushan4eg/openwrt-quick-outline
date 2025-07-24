@@ -9,21 +9,37 @@ PRESET_OUTLINE_CONFIG=""
 
 echo 'Starting Outline OpenWRT install script'
 
-# Step 1: Check for kmod-tun
+# Step 1: Check for kmod-tun and install if needed
+PACKAGES_TO_INSTALL=""
 opkg list-installed | grep kmod-tun > /dev/null
 if [ $? -ne 0 ]; then
-    echo "kmod-tun is not installed. Exiting."
-    exit 1
+    echo "kmod-tun is not installed."
+    PACKAGES_TO_INSTALL="$PACKAGES_TO_INSTALL kmod-tun"
+else
+    echo 'kmod-tun installed'
 fi
-echo 'kmod-tun installed'
 
-# Step 2: Check for ip-full
+# Step 2: Check for ip-full and install if needed
 opkg list-installed | grep ip-full > /dev/null
 if [ $? -ne 0 ]; then
-    echo "ip-full is not installed. Exiting."
-    exit 1
+    echo "ip-full is not installed."
+    PACKAGES_TO_INSTALL="$PACKAGES_TO_INSTALL ip-full"
+else
+    echo 'ip-full installed'
 fi
-echo 'ip-full installed'
+
+# Install missing packages if any
+if [ -n "$PACKAGES_TO_INSTALL" ]; then
+    echo "Updating package list..."
+    opkg update
+    echo "Installing missing packages:$PACKAGES_TO_INSTALL"
+    opkg install $PACKAGES_TO_INSTALL
+    if [ $? -ne 0 ]; then
+        echo "Failed to install required packages. Exiting."
+        exit 1
+    fi
+    echo "Packages installed successfully"
+fi
 
 # Step 3: Check for tun2socks then download if needed
 NEED_RESTART=0
