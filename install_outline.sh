@@ -4,7 +4,7 @@
 
 # CONFIGURATION: Set your Outline config here to skip manual input
 # Leave empty to prompt for input during script execution
-# Example: PRESET_OUTLINE_CONFIG="ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpHIXlCd1BXSDNWYW9AMTkyLjI0MS4xNTQuMTc6ODA4Mw/?outline=1"
+# Example: PRESET_OUTLINE_CONFIG="ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpHIXlCd1BXSDNasdfsadfsafdMS4xNTQuMTc6ODA4Mw/?outline=1"
 PRESET_OUTLINE_CONFIG=""
 
 echo 'Starting Outline OpenWRT install script'
