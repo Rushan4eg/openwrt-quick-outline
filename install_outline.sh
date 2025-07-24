@@ -91,9 +91,17 @@ else
     echo 'No network changes needed, skipping restart'
 fi
 
-# Step 8: Read user variables
-read -p "Enter Outline Server IP: " OUTLINEIP
+# Step 8: Read Outline config and extract server IP
 read -p "Enter Outline (Shadowsocks) Config (format ss://base64coded@HOST:PORT/?outline=1): " OUTLINECONF
+
+# Extract server IP from ss:// URL
+OUTLINEIP=$(echo "$OUTLINECONF" | sed -n 's/.*@\([^:]*\):.*/\1/p')
+if [ -z "$OUTLINEIP" ]; then
+    echo "Error: Could not extract server IP from config. Please check the format."
+    echo "Expected format: ss://base64coded@HOST:PORT/?outline=1"
+    exit 1
+fi
+echo "Extracted server IP: $OUTLINEIP"
 
 # Step 9: Check for default gateway
 DEFGW=$(ip route | grep default | awk '{print $3}')
